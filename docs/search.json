@@ -1,0 +1,51 @@
+[
+  {
+    "objectID": "descriptive_stat.html",
+    "href": "descriptive_stat.html",
+    "title": "descriptive-stat",
+    "section": "",
+    "text": "使用gtsummary套件中的tbl_summary()呈現類別變項的次數分佈。若要呈現交叉表（cross table），則使用tbl_cross()。\n\ndf %&gt;%\n  dplyr::select(居住地) %&gt;%\n  tbl_summary(missing_text = \"NA\") %&gt;%\n  as_flex_table() %&gt;% #指定以flextable格式輸出\n  set_caption(\"居住地次數分布\")\n\n\nCharacteristicN = 2,0721居住地大都市或周圍郊區1,148 (56%)非大都市和周圍郊區907 (44%)NA171n (%)\n\ndf %&gt;%\n  tbl_cross(row = 年齡分組,\n            col = 同性戀結婚,\n            missing_text = \"NA\") %&gt;%\n  as_flex_table() %&gt;%\n  set_caption(\"同性戀結婚支持與否與年齡分組的交叉表\")\n\n\n 同性戀結婚 表態贊成者非表態贊成者Total年齡分組40歲（含）以下63824187941~60歲35240575761歲（含）以上99337436Total1,0899832,072\n\ndf %&gt;%\n  drop_na(居住地) %&gt;%\n  ggplot(aes(x=居住地)) +\n  geom_bar() +\n  labs(\n    y =  \"次數\",\n    title = \"居住地次數分布\"\n  ) +\n  theme(\n    text = element_text(family = \"微軟正黑體\"),\n    plot.title = element_text(hjust = 0.5)\n  )"
+  },
+  {
+    "objectID": "descriptive_stat.html#類別變項次數分佈",
+    "href": "descriptive_stat.html#類別變項次數分佈",
+    "title": "descriptive-stat",
+    "section": "",
+    "text": "使用gtsummary套件中的tbl_summary()呈現類別變項的次數分佈。若要呈現交叉表（cross table），則使用tbl_cross()。\n\ndf %&gt;%\n  dplyr::select(居住地) %&gt;%\n  tbl_summary(missing_text = \"NA\") %&gt;%\n  as_flex_table() %&gt;% #指定以flextable格式輸出\n  set_caption(\"居住地次數分布\")\n\n\nCharacteristicN = 2,0721居住地大都市或周圍郊區1,148 (56%)非大都市和周圍郊區907 (44%)NA171n (%)\n\ndf %&gt;%\n  tbl_cross(row = 年齡分組,\n            col = 同性戀結婚,\n            missing_text = \"NA\") %&gt;%\n  as_flex_table() %&gt;%\n  set_caption(\"同性戀結婚支持與否與年齡分組的交叉表\")\n\n\n 同性戀結婚 表態贊成者非表態贊成者Total年齡分組40歲（含）以下63824187941~60歲35240575761歲（含）以上99337436Total1,0899832,072\n\ndf %&gt;%\n  drop_na(居住地) %&gt;%\n  ggplot(aes(x=居住地)) +\n  geom_bar() +\n  labs(\n    y =  \"次數\",\n    title = \"居住地次數分布\"\n  ) +\n  theme(\n    text = element_text(family = \"微軟正黑體\"),\n    plot.title = element_text(hjust = 0.5)\n  )"
+  },
+  {
+    "objectID": "descriptive_stat.html#數值變項描述統計",
+    "href": "descriptive_stat.html#數值變項描述統計",
+    "title": "descriptive-stat",
+    "section": "數值變項描述統計",
+    "text": "數值變項描述統計\n使用modelsummary套件中的datasummary()呈現數值變項描述統計表，指定呈現樣本數N（不計遺漏值）、平均數Mean、標準差SD、中位數Median、最小值Min與最大值Max。也可以指定分組，呈現分組平均數。\n\ndatasummary(同性戀開放度 ~ N+Mean+SD+Median+Min+Max,\n            data = df,\n            out = \"flextable\", #指定以flextable格式輸出\n            title = \"同性戀開放度描述統計表\")\n\n\n NMeanSDMedianMinMax同性戀開放度174717.594.5518.006.0030.00\n\ndf %&gt;%\n  drop_na(同性戀開放度) %&gt;%\n  ggplot(aes(x=同性戀開放度)) +\n  geom_boxplot() +\n  labs(\n    title = \"同性戀開放度盒形圖\"\n  ) +\n  theme(\n    text = element_text(family = \"微軟正黑體\"),\n    plot.title = element_text(hjust = 0.5)\n  )\n\n\n\n#可分組\ndatasummary(同性戀開放度 ~ 居住地*(Mean),\n            data = df,\n            out = \"flextable\",\n            title = \"同性戀開放度平均數（按居住地分）\")\n\n\n 大都市或周圍郊區非大都市和周圍郊區同性戀開放度18.2816.71\n\ndf %&gt;%\n  drop_na(同性戀開放度, 居住地) %&gt;%\n  ggplot(aes(x = 居住地, y = 同性戀開放度)) +\n  geom_boxplot() +\n  labs(\n    title = \"同性戀開放度盒形圖（依居住地分組）\",\n    x = \"居住地\",\n    y = \"同性戀開放度\"\n  ) +\n  theme(\n    text = element_text(family = \"微軟正黑體\"),\n    plot.title = element_text(hjust = 0.5)\n  )"
+  },
+  {
+    "objectID": "descriptive_stat.html#相關係數矩陣",
+    "href": "descriptive_stat.html#相關係數矩陣",
+    "title": "descriptive-stat",
+    "section": "相關係數矩陣",
+    "text": "相關係數矩陣\n使用modelsummary套件中的datasummary_correlation()呈現相關係數矩陣，該函數自動呈現下三角型。\n\ndf %&gt;%\n  dplyr::select(同性戀開放度, 就學年數, 性別刻板印象) %&gt;%\n  drop_na() %&gt;%\n  datasummary_correlation(output = \"flextable\",\n                          title =  \"同性戀開放度、就學年數與性別刻板印象之相關矩陣\")\n\n\n 同性戀開放度就學年數性別刻板印象同性戀開放度1..就學年數.301.性別刻板印象-.28-.171"
+  },
+  {
+    "objectID": "descriptive_stat.html#模型結果呈現",
+    "href": "descriptive_stat.html#模型結果呈現",
+    "title": "descriptive-stat",
+    "section": "模型結果呈現",
+    "text": "模型結果呈現\n使用modelsummary套件中的modelsummary()呈現迴歸模型結果。\n\nmodel_1 &lt;- lm(同性戀開放度 ~ \n              就學年數 +\n              factor(年齡分組) +\n              factor(居住地),\n              data = df)\n\nmodel_2 &lt;- lm(同性戀開放度 ~ \n              就學年數 +\n              性別刻板印象 +\n              factor(年齡分組) +\n              factor(居住地) +\n              就學年數 * 性別刻板印象,\n              data = df)\n\nmodelsummary(list(model_1,model_2),\n             stars = TRUE,\n             out = \"flextable\",\n             gof_map = c(\"nobs\", \"r.squared\", \"adj.r.squared\"),\n             title = \"同性戀開放度迴歸模型\") \n\n\n (1)(2)(Intercept)18.631***20.004***(0.243)(0.567)就學年數0.164***0.227*(0.023)(0.110)factor(年齡分組)41~60歲-2.003***-1.789***(0.230)(0.255)factor(年齡分組)61歲（含）以上-4.429***-3.594***(0.304)(0.337)factor(居住地)非大都市和周圍郊區-0.894***-0.775***(0.205)(0.229)性別刻板印象-0.763***(0.225)就學年數 × 性別刻板印象-0.033(0.050)Num.Obs.16441231R20.2160.227R2 Adj.0.2140.223+ p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001\n\n#畫分組迴歸線\ndf %&gt;%\n  drop_na(同性戀開放度,就學年數,居住地) %&gt;%\n  ggplot(aes(x=就學年數,\n             y=同性戀開放度,\n             color=居住地)) +\n  geom_smooth(method=\"lm\", se = F, size =0.8)+\n  scale_color_manual(values=c(\"red\",\"blue\"), labels = c(\"大都市\",\"非大都市\"))"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "R code cheat sheets",
+    "section": "",
+    "text": "As title :)"
+  }
+]

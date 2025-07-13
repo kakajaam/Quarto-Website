@@ -1,0 +1,8 @@
+---
+title: "R code cheat sheets"
+subtitle: "some useful R codes"
+---
+
+As title :)
+
+![](images/DSCF0514.jpeg)
