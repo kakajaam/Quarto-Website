@@ -1,5 +1,5 @@
 ---
-title: "descriptive-stat"
+title: "Descriptive Statistics"
 format: html
 ---
 
