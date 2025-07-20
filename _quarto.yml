@@ -10,7 +10,7 @@ website:
         text: Home
       - href: descriptive_stat.qmd
         text: Descriptive statistics
-      - href: cheat sheet.qmd
+      - href: cheat_sheet.qmd
         text: cheat sheet
 
 format:
