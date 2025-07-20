@@ -23,7 +23,9 @@ attach(df)
 
 df <- df %>%
   mutate(居住地 = rec(a9, rec = "1:2=大都市或周圍郊區;3:5=非大都市和周圍郊區;else=NA"),
-         居住地 = factor(居住地, levels = c("大都市或周圍郊區","非大都市和周圍郊區"))) %>%
+         居住地 = factor(居住地, levels = c("大都市或周圍郊區","非大都市和周圍郊區")),
+         sex = rec(a1, rec = "1=1;2=0;else=NA"),
+         sex = factor(sex, levels=c(0,1), labels=c("女","男"))) %>%
   mutate(
     a2y_r = rec(a2y, rec = "0,97,98 = NA; else = copy"),
     age = as.numeric(year_m) - as.numeric(a2y_r),
@@ -42,7 +44,7 @@ df <- df %>%
   rowwise() %>%
   mutate(同性戀開放度 = sum(c_across(j7a_r:j7g_r), na.rm = F)) %>%
   ungroup() %>%
-  mutate(性別刻板印象 = as.numeric(rec(f3a, rec = "5=3;1=5;2=4;3=2;4d=1;else=NA"))) %>%
+  mutate(性別刻板印象 = as.numeric(rec(f3a, rec = "5=3;1=5;2=4;3=2;4=1;else=NA"))) %>%
   mutate(就學年數 = as.numeric(rec(b7, rec = "97:99=NA; else=copy"))) %>%
   mutate(同性戀結婚 = as.factor(rec(j7g, rec = "1:2=表態贊成者;else=非表態贊成者")))
 ```
@@ -61,7 +63,7 @@ df %>%
 df %>%
   tbl_cross(row = 年齡分組,
             col = 同性戀結婚,
-            percent = "row",
+            percent = "row",  #x=age, percent=x
             missing_text = "NA") %>%
   as_flex_table() %>%
   set_caption("同性戀結婚支持與否與年齡分組的交叉表")
@@ -76,7 +78,8 @@ df %>%
   ) +
   theme(
     text = element_text(family = "微軟正黑體"),
-    plot.title = element_text(hjust = 0.5)
+    plot.title = element_text(hjust = 0.5),
+    axis.text.x = element_text(angle = 10) #x軸label角度偏移
   )
 ```
 
@@ -133,11 +136,15 @@ df %>%
   drop_na() %>%
   datasummary_correlation(output = "flextable",
                           title =  "同性戀開放度、就學年數與性別刻板印象之相關矩陣")
+
+cor.test(df$同性戀開放度,df$就學年數) #只能做兩兩相關
 ```
 
 ## 模型結果呈現
 
 使用`modelsummary`套件中的`modelsummary()`呈現迴歸模型結果。
+
+可以透過 `df$sex <- relevel(df$sex, ref = "男")` 重新指定參照組。
 
 ```{r warning=FALSE, message=FALSE}
 model_1 <- lm(同性戀開放度 ~ 
