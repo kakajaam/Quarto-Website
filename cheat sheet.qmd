@@ -1,0 +1,135 @@
+---
+title: "exam cheat sheet"
+format: html
+---
+
+yaml的區塊
+
+------------------------------------------------------------------------
+
+`output:`
+
+`word_document:`
+
+`highlight: NULL`
+
+------------------------------------------------------------------------
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(haven)
+library(sjmisc)
+library(gtsummary)
+library(modelsummary)
+library(flextable)
+library(psych)
+library(stargazer)
+library(showtext)
+font.add("黑體", "/System/Library/Fonts/STHeiti Medium.ttc" )
+showtext.auto()
+
+setwd("/Users/yyaaabbeee/Desktop/working directory")
+
+df <- read_sav("tscs2021q1.sav")
+
+df <- df %>%
+  mutate(edu = rec(a10, rec = "1:3=國小或以下;4:5=國中;6:9=高中;10:19=專科或大學;20:21=碩士或博士;else=NA"),
+  edu = factor(edu, levels = c("國小或以下","國中","高中","專科或大學","碩士或博士")))
+
+df <- df %>%
+  mutate(divorce = case_when(
+    f2 %in% c(1,3,97,98) ~ 1,
+    f2 == 2 ~ 0,
+    TRUE ~ NA),
+    divorce = factor(divorce, levels = c(1,0), labels = c("想離婚","不想離婚")))
+
+df <- df %>%
+  mutate(marital = case_when(
+   a5 == 6 ~ "未婚",
+   a5 == 1 & divorce == "不想離婚" ~ "已婚有偶且未曾認真考慮離婚",
+   a5 == 1 & divorce == "想離婚" ~ "已婚有偶且曾認真考慮離婚",
+   a5 %in% c(3,4) ~ "離婚/分居",
+   TRUE ~ NA
+  ))
+
+df <- df %>%
+  mutate(child = rec(f1b, rec = "97,98=NA;else=copy"), #指標越大越看重小孩
+         f1c_r = rec(f1c, rec = "1=7;2=6;3=5;4=4;5=3;6=2;7=1;else=NA"),
+         f1d_r = rec(f1d, rec = "1=7;2=6;3=5;4=4;5=3;6=2;7=1;else=NA"),
+         f1e_r = rec(f1e, rec = "97,98=NA;else=copy"),
+         f1f_r = rec(f1f, rec = "97,98=NA;else=copy")) 
+```
+
+#### 年齡計算方式
+
+```{r warning=FALSE}
+df <- df %>%
+  mutate(
+    a2y = as.numeric(a2y),
+    a2r = as.numeric(a2r),
+    year = as.numeric(year),
+    a2y_r = ifelse(a2y > 995, NA, a2y),
+    a2r_r = ifelse(a2r > 995, NA, a2r),
+    age_calculated = year - (a2y_r + 1911),  # 民國年轉西元年
+    age = case_when(
+      !is.na(a2r_r) ~ a2r_r,           # 優先使用受訪者告知年齡
+      !is.na(age_calculated) ~ age_calculated,  # 其次用計算年齡
+      TRUE ~ NA
+    ))
+
+```
+
+#### 指標分數加總
+
+```{r}
+df <- df %>%
+  rowwise() %>% #類似rowSums
+  mutate(marriage = sum(c_across(f1c_r:f1d_r), na.rm=F)) %>%
+  ungroup()
+```
+
+#### 邏輯迴歸（y為二元變數）
+
+```{r}
+model <- glm(divorce ~ age + factor(edu), df, family = "binomial")
+```
+
+#### 信度分析（大於等於0.7）
+
+```{r}
+alpha <- df %>%
+  dplyr::select(f1c_r:f1f_r) %>%
+  alpha()
+
+alpha$total$raw_alpha 
+```
+
+#### 卡方檢定
+
+```{r}
+table <- table(df$divorce, df$edu)
+chisq.test(table) 
+```
+
+#### 兩獨立樣本T檢定
+
+相依樣本則是`t.test(df$x1, df$x2, paired = TRUE)`
+
+```{r}
+t.test(age ~ divorce, df)
+```
+
+#### Anova
+
+```{r}
+aovtest <- aov(marriage~marital, df) 
+summary(aovtest)
+
+tukey <- TukeyHSD(aovtest)
+tukey <- as.data.frame(tukey$marital)%>%
+  mutate(Comparison = rownames(.))%>%
+  relocate(Comparison)
+
+flextable(tukey) %>%
+  set_caption("組間比較")
+```

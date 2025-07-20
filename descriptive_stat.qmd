@@ -61,6 +61,7 @@ df %>%
 df %>%
   tbl_cross(row = 年齡分組,
             col = 同性戀結婚,
+            percent = "row",
             missing_text = "NA") %>%
   as_flex_table() %>%
   set_caption("同性戀結婚支持與否與年齡分組的交叉表")
