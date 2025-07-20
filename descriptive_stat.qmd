@@ -16,7 +16,7 @@ library(showtext)
 font_add("微軟正黑體","/System/Library/Fonts/STHeiti Medium.ttc")
 showtext_auto()
 
-setwd("/Users/yyaaabbeee/Downloads/0603Q2")
+setwd("/Users/yyaaabbeee/Desktop/working directory")
 df <- read_sav("tscs2012q2.sav")
 
 attach(df)
@@ -106,7 +106,8 @@ df %>%
   )
 
 #可分組
-datasummary(同性戀開放度 ~ 居住地*(Mean),
+#「同性戀開放度」與「居住地」可以交換，數字不變，長寬格式轉換
+datasummary(同性戀開放度 ~ 居住地*(Mean), 
             data = df,
             out = "flextable",
             title = "同性戀開放度平均數（按居住地分）")
